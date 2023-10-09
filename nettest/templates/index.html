@@ -1,0 +1,55 @@
+<!--index.html-->
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>{{.title}}</title>
+<link rel="stylesheet" href="/style/index.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cousine&display=swap" rel="stylesheet"> 
+</head>
+<body>
+<header>
+    <div class="logo">
+        <a href="/" class="link-logo">
+            <img class="img-logo" src="images/logo.svg">
+        </a>
+    </div>
+    <div class="menu">
+        <a href="/">Услуги</a>
+        </ul>
+    </div>
+</header>
+<main>
+    <div class="filters">
+        <form action="/NetTest/public" method="GET">
+            Отфильтровать по цене:
+            <input type="text" name="from" placeholder="От" value="{{.from}}">
+            <input type="text" name="to" placeholder="До" value="{{.to}}">
+            <button type="submit" id="submit">Найти</button>
+        </form>
+    </div>
+    <div class="cards">
+        {{range $element := .products}}
+        <div class="card">
+            <img src="{{$element.ImgSrc}}" class="img-card">
+            <div class="description">
+                <h3> {{$element.Name}}</h3>
+                <p>
+                    {{$element.Description}}
+                </p>
+            </div>
+            <div class="price">
+                <p>{{$element.Price}}₽</p>
+            </div>
+            <div class="more">
+                <a href="products/{{$element.Id}}" class="btn-more">Подробнее</a>
+            </div>
+        </div>
+        {{end}}
+    </div>
+</main>
+<footer></footer>
+</body>
+</html> 

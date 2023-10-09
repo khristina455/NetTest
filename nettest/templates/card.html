@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>NetTest</title>
+<link rel="stylesheet" href="/style/index.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cousine&display=swap" rel="stylesheet"> 
+</head>
+<body>
+<header>
+    <div class="logo">
+        <a href="/" class="link-logo">
+            <img class="img-logo" src="/images/logo.svg">
+        </a>
+    </div>
+    <div class="menu">
+        <a href="/">Услуги</a>
+        </ul>
+    </div>
+</header>
+<main>
+    <div class="card-container">
+        <div class="single-card">
+            <img src="{{.product.ImgSrc}}" class="img-card">
+            <div class="description">
+                <h3>{{.product.Name}}</h3>
+                <p>
+                    {{.product.Description}}
+                </p>
+            </div>
+            <div class="price">
+                <p>{{.product.Price}}₽</p>
+            </div>
+        </div>
+    </div>
+</main>
+<footer></footer>
+</body>
+</html> 
