@@ -1,18 +1,17 @@
 package main
 
 import (
-	"log"
-	"nettest/internal/pkg/app"
+	"nettest/internal/pkg/app/handler"
+	"nettest/internal/pkg/app/repo"
+	"nettest/internal/pkg/db"
 )
 
 func main() {
-	//log.Println("Start")
-	//api.StartServer()
-	//log.Println("terminated")
+	connection, _ := db.GetConnectionString()
+	repo, _ := repo.NewRepository(connection)
 
-	application := app.New()
-	log.Println("app created")
-	log.Println("run server")
-	application.Run()
-	log.Println("server terminated")
+	handler := handler.NewHandler(repo)
+
+	r := handler.InitRoutes()
+	r.Run()
 }

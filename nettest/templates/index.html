@@ -33,7 +33,7 @@
     <div class="cards">
         {{range $element := .products}}
         <div class="card">
-            <img src="{{$element.ImgSrc}}" class="img-card">
+            <img src="{{$element.Image}}" class="img-card">
             <div class="description">
                 <h3> {{$element.Name}}</h3>
                 <p>
@@ -44,7 +44,7 @@
                 <p>{{$element.Price}}₽</p>
             </div>
             <div class="more">
-                <a href="products/{{$element.Id}}" class="btn-more">Подробнее</a>
+                <a href="products/{{$element.ModelingId}}" class="btn-more">Подробнее</a>
             </div>
         </div>
         {{end}}

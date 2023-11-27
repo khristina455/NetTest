@@ -1,2 +1,2 @@
 db:
-  connection_string: "host=localhost port=5432 user=khristina_admin dbname=nettestDB password=23042003 sslmode=disable"
+  connection_string: "host=localhost port=5433 user=khristina_admin dbname=nettestDB password=23042003 sslmode=disable"

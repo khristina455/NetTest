@@ -6,9 +6,10 @@ services:
       - .env
     environment:
       POSTGRES_DB: ${DB_NAME}
-      POSTGRES_USER: ${$DB_USER}
+      POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
-      - ./db/init.sql:/docker-entrypoint-initdb.d
+      - /home/khristina/db_data:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/initdb.sql
     ports:
-      - "5432:5432"
+      - "5433:5432"
