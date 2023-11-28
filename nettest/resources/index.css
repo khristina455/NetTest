@@ -149,16 +149,47 @@ ul {
     font-size: 20px;
 }
 
+.card__btns {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    padding-right: 8px;
+}
+
 .btn-more {
     display: flex;
+    width: 150px;
     background-color: #7f5af0;
     border-radius: 5px;
     padding: 4px 50px;
     margin-top: 30px;
-    font-size: 18px;
+    font-size: 12px;
     margin-bottom: 30px;
     margin-left: 24px;
     height: 20px;
+    box-sizing: border-box;
+}
+
+.delete {
+    display: flex;
+    text-align: center;
+    align-items: center;
+    height: 105px;
+    margin-top: auto;
+}
+
+.btn-delete {
+    display: flex;
+    cursor: pointer;
+    box-sizing: border-box;
+    width: 80px;
+    color:#fffffe;
+    background-color: #f95063;
+    border-radius: 5px;
+    font-size: 12px;
+    height: 20px;
+    border: none;
+    padding: 4px 20px;
 }
 
 .description {

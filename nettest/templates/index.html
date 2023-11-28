@@ -43,8 +43,13 @@
             <div class="price">
                 <p>{{$element.Price}}₽</p>
             </div>
-            <div class="more">
-                <a href="products/{{$element.ModelingId}}" class="btn-more">Подробнее</a>
+            <div class="card__btns">
+                <div class="more">
+                    <a href="products/{{$element.ModelingId}}" class="btn-more">Подробнее</a>
+                </div>
+                    <form action="products/{{$element.ModelingId}}" method="post" class="delete">
+                        <button class="btn-delete">Удалить</button>
+                    </form>
             </div>
         </div>
         {{end}}

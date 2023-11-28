@@ -5,7 +5,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
-	"nettest/internal/models"
 	"nettest/internal/pkg/app"
 	"strconv"
 )
@@ -56,25 +55,17 @@ func (h *Handler) GetCardsList(c *gin.Context) {
 		to = 1e9
 	}
 
-	resultModelings := make([]models.Modeling, 0)
-
-	modelings, err := h.repo.GetModelings()
+	modelings, err := h.repo.GetModelings(from, to)
 	if err != nil {
 		log.Printf("cant get product by id %v", err)
 		c.Error(err)
 		return
 	}
 
-	for _, v := range modelings {
-		if v.Price >= float32(from) && v.Price <= float32(to) {
-			resultModelings = append(resultModelings, v)
-		}
-	}
-
 	fmt.Println(modelings)
 	c.HTML(http.StatusOK, "index.html", gin.H{
 		"title":    "Nettest",
-		"products": resultModelings,
+		"products": modelings,
 	})
 }
 

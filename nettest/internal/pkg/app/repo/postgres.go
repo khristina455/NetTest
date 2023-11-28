@@ -39,17 +39,17 @@ func (r *Repo) GetModelingByID(modelingId int) (models.Modeling, error) {
 }
 
 func (r *Repo) DeleteModelingByID(modelingId int) error {
-	err := r.db.Exec("UPDATE modeling SET is_deleted=true WHERE modeling_id = ?", modelingId).Error
+	err := r.db.Exec("UPDATE modelings SET is_deleted=true WHERE modeling_id = ?", modelingId).Error
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (r *Repo) GetModelings() ([]models.Modeling, error) {
+func (r *Repo) GetModelings(from, to int) ([]models.Modeling, error) {
 	modelings := make([]models.Modeling, 0)
 
-	r.db.Where("is_deleted = ?", false).Find(&modelings)
+	r.db.Where("is_deleted = ? AND price >= ? AND ? >= price", false, from, to).Find(&modelings)
 
 	return modelings, nil
 }
