@@ -77,14 +77,7 @@ services:
       - ./db/init.sql:/docker-entrypoint-initdb.d/initdb.sql
     ports:
       - "5433:5432"
-  redis:
-    image: redis:6.2-alpine
-    restart: always
-    ports:
-      - '6379:6379'
-    command: redis-server --save 20 1 --loglevel warning --requirepass password
-    volumes:
-      - redis-data:/data
+
 
 ## По умолчанию в этой конфигурации используется локальный драйвер docker по умолчанию,
 ## Для пользовательских томов замените на конфигурацию драйвера тома.
@@ -99,5 +92,3 @@ volumes:
   data4-2:
   postgresdb-data:
     driver: local
-  redis-data:
-      driver: local

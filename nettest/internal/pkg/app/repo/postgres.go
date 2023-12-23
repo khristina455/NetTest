@@ -22,7 +22,6 @@ func NewRepository(connectionString string) (*Repo, error) {
 	}
 
 	err = db.AutoMigrate(&models.Modeling{})
-	err = db.AutoMigrate(&models.User{})
 	err = db.AutoMigrate(&models.AnalysisRequest{})
 	err = db.AutoMigrate(&models.AnalysisRequestsModeling{})
 	if err != nil {

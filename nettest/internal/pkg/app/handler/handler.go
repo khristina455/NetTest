@@ -51,14 +51,6 @@ func (h *Handler) InitRoutes() *gin.Engine {
 // Взятие услуг
 // Есть get параметры to from для фильтрации по цене
 // Возвращает отфильтованные услуги и id черновой заявки
-
-// Ping godoc
-// @Summary      Show hello text
-// @Description  very very friendly response
-// @Tags         Tests
-// @Produce      json
-// @Success      200  {object}  models.Modeling
-// @Router       /ping/{name} [get]
 func (h *Handler) GetModelingsList(c *gin.Context) {
 	to, _ := strconv.Atoi(c.Query("to"))
 	from, _ := strconv.Atoi(c.Query("from"))
