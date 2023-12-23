@@ -22,6 +22,9 @@ func NewRepository(connectionString string) (*Repo, error) {
 	}
 
 	err = db.AutoMigrate(&models.Modeling{})
+	err = db.AutoMigrate(&models.User{})
+	err = db.AutoMigrate(&models.AnalysisRequest{})
+	err = db.AutoMigrate(&models.AnalysisRequestsModeling{})
 	if err != nil {
 		log.Fatal("cant migrate db")
 	}
@@ -284,4 +287,13 @@ func (r *Repo) UpdateModelingRequest(userId int, updateModelingRequest models.An
 
 	result := r.db.Save(modelingRequest)
 	return result.Error
+}
+
+func (r *Repo) SignUp(newUser models.User) error {
+	return r.db.Create(&newUser).Error
+}
+
+func (r *Repo) GetByCredentials(user models.User) (models.User, error) {
+	err := r.db.First(&user, "login = ? AND password = ?", user.Login, user.Password).Error
+	return user, err
 }
