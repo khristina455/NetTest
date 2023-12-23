@@ -1,2 +1,9 @@
 db:
   connection_string: "host=localhost port=5433 user=khristina_admin dbname=nettestDB password=23042003 sslmode=disable"
+
+minio:
+  host: "localhost:9000"
+  location: "us-east-1"
+  accessKeyId: "khristina_admin"
+  secretAccessKey: "23042003"
+  bucketName: "modelings"

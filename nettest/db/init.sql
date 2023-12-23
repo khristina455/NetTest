@@ -30,7 +30,7 @@ create table analysis_requests
     creation_date      timestamp       default now() not null,
     formation_date     timestamp,
     complete_date      timestamp,
-    admin_id           int,
+    admin_id           int             DEFAULT NULL,
     FOREIGN KEY (user_id) REFERENCES "users"(user_id),
     FOREIGN KEY (admin_id) REFERENCES "users"(user_id)
 );
