@@ -32,13 +32,12 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	r.POST("/modelings", h.AddModeling)
 	r.PUT("/modelings/:id", h.UpdateModeling)
 	r.DELETE("/modelings/:id", h.DeleteModeling)
-	r.POST("/modelings/:id/request", h.AddModelingToRequest)
+	r.POST("/modelings/request", h.AddModelingToRequest)
 
 	r.GET("/analysis-requests", h.GetRequestsList)
 	r.GET("/analysis-requests/:id", h.GetRequest)
-	r.PUT("/analysis-requests/:id/register", h.RegisterRequest)
-	r.PUT("/analysis-requests/:id/complete", h.CompleteRequest)
-	r.PUT("/analysis-requests/:id/cancel", h.CancelRequest)
+	r.PUT("/analysis-requests/client", h.UpdateStatusClient)
+	r.PUT("/analysis-requests/:id/admin", h.UpdateStatusAdmin)
 	r.DELETE("/analysis-requests/:id", h.DeleteRequest)
 
 	r.DELETE("/modelings/:id/requests", h.DeleteModelingFromRequest)
@@ -188,7 +187,7 @@ func (h *Handler) DeleteModeling(c *gin.Context) {
 	c.JSON(http.StatusOK, "услуга удалена")
 }
 
-// Добавление услуги к завяки, в полях указывается ид услуги, если услуги еще нето то ид=0
+// Добавление услуги к завяки, в полях указывается ид услуги
 func (h *Handler) AddModelingToRequest(c *gin.Context) {
 	var request models.RequestCreateMessage
 
@@ -198,7 +197,6 @@ func (h *Handler) AddModelingToRequest(c *gin.Context) {
 		return
 	}
 	request.UserId = models.GetClientId()
-	request.ModelingId, err = strconv.Atoi(c.Param("id"))
 
 	err = h.repo.AddModelingToRequest(request)
 
@@ -249,6 +247,7 @@ func (h *Handler) GetRequestsList(c *gin.Context) {
 	c.JSON(http.StatusOK, analysisRequests)
 }
 
+// Взятие заявки по ид и возвращает заявку с услугами и полями м-м
 func (h *Handler) GetRequest(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -264,15 +263,10 @@ func (h *Handler) GetRequest(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"request": request, "modelings": modelings})
 }
 
-func (h *Handler) RegisterRequest(c *gin.Context) {
-	requestId := c.Param("id")
-	id, err := strconv.Atoi(requestId)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, err)
-	}
-
+// Регистрация заявки-черновика клиентом
+func (h *Handler) UpdateStatusClient(c *gin.Context) {
 	var newRequestStatus models.AnalysisRequest
-	err = c.BindJSON(&newRequestStatus)
+	err := c.BindJSON(&newRequestStatus)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
@@ -283,7 +277,7 @@ func (h *Handler) RegisterRequest(c *gin.Context) {
 		return
 	}
 
-	err = h.repo.UpdateAnalysisRequestStatus(id, newRequestStatus.Status)
+	err = h.repo.UpdateAnalysisRequestStatus(0, newRequestStatus.Status)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
@@ -292,7 +286,8 @@ func (h *Handler) RegisterRequest(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Статус изменен"})
 }
 
-func (h *Handler) CompleteRequest(c *gin.Context) {
+// Отмена/повреждение заявки админом по ид
+func (h *Handler) UpdateStatusAdmin(c *gin.Context) {
 	requestId := c.Param("id")
 	id, err := strconv.Atoi(requestId)
 	if err != nil {
@@ -306,36 +301,8 @@ func (h *Handler) CompleteRequest(c *gin.Context) {
 		return
 	}
 
-	if newRequestStatus.Status != "COMPLETE" {
+	if newRequestStatus.Status != "COMPLETE" && newRequestStatus.Status != "CANCELED" {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "Поменять статус можно только на 'COMPLETE'"})
-		return
-	}
-
-	err = h.repo.UpdateAnalysisRequestStatus(id, newRequestStatus.Status)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"message": "Статус изменен"})
-}
-
-func (h *Handler) CancelRequest(c *gin.Context) {
-	requestId := c.Param("id")
-	id, err := strconv.Atoi(requestId)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, err)
-	}
-
-	var newRequestStatus models.AnalysisRequest
-	err = c.BindJSON(&newRequestStatus)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
-		return
-	}
-
-	if newRequestStatus.Status != "CANCELED" {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "Поменять статус можно только на 'CANCELED'"})
 		return
 	}
 

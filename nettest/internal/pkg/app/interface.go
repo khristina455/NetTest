@@ -15,8 +15,8 @@ type Repo interface {
 	UpdateModeling(modeling models.Modeling) error
 	AddModelingToRequest(modeling models.RequestCreateMessage) error
 	GetAnalysisRequests(status string, startDate, endDate time.Time) ([]models.AnalysisRequest, error)
-	GetAnalysisRequestById(id int) (models.AnalysisRequest, []models.Modeling, error)
+	GetAnalysisRequestById(id int) (models.AnalysisRequest, []models.ModelingInRequestMessage, error)
 	UpdateAnalysisRequestStatus(requestId int, status string) error
-	DeleteModelingFromRequest(userId, modelingId int) (models.AnalysisRequest, []models.Modeling, error)
+	DeleteModelingFromRequest(userId, modelingId int) (models.AnalysisRequest, []models.ModelingInRequestMessage, error)
 	UpdateModelingRequest(userId int, updateModelingRequest models.AnalysisRequestsModeling) error
 }

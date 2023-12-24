@@ -193,9 +193,11 @@ func (r *Repo) GetAnalysisRequests(status string, startDate, endDate time.Time) 
 	return analysisRequests, res.Error
 }
 
-func (r *Repo) GetAnalysisRequestById(requestId int) (models.AnalysisRequest, []models.Modeling, error) {
+func (r *Repo) GetAnalysisRequestById(requestId int) (models.AnalysisRequest, []models.ModelingInRequestMessage, error) {
 	var analysisRequest models.AnalysisRequest
 	var modelings []models.Modeling
+	var requestModeling []models.AnalysisRequestsModeling
+	var modelingsWithFields []models.ModelingInRequestMessage
 
 	result := r.db.First(&analysisRequest, "request_id =?", requestId)
 	if result.Error != nil {
@@ -212,14 +214,43 @@ func (r *Repo) GetAnalysisRequestById(requestId int) (models.AnalysisRequest, []
 		return models.AnalysisRequest{}, nil, res.Error
 	}
 
-	return analysisRequest, modelings, nil
+	res = r.db.Where("request_id = ?", requestId).Find(&requestModeling)
+	if res.Error != nil {
+		return models.AnalysisRequest{}, nil, res.Error
+	}
+
+	for ind := range modelings {
+		var currentRequest models.ModelingInRequestMessage
+		currentRequest.ModelingId = modelings[ind].ModelingId
+		currentRequest.Name = modelings[ind].Name
+		currentRequest.Image = modelings[ind].Image
+		currentRequest.Description = modelings[ind].Description
+		currentRequest.IsDeleted = modelings[ind].IsDeleted
+		currentRequest.Price = modelings[ind].Price
+
+		currentRequest.ClientQuantity = requestModeling[ind].ClientQuantity
+		currentRequest.QueueSize = requestModeling[ind].QueueSize
+		currentRequest.NodeQuantity = requestModeling[ind].NodeQuantity
+
+		modelingsWithFields = append(modelingsWithFields, currentRequest)
+	}
+
+	return analysisRequest, modelingsWithFields, nil
 }
 
 func (r *Repo) UpdateAnalysisRequestStatus(requestId int, status string) error {
 	var analysisRequest models.AnalysisRequest
-	err := r.db.First(&analysisRequest, "request_id = ?", requestId)
-	if err.Error != nil {
-		return err.Error
+
+	if requestId == 0 {
+		err := r.db.First(&analysisRequest, "user_id = ? AND status = ?", models.GetClientId(), "DRAFT")
+		if err.Error != nil {
+			return err.Error
+		}
+	} else {
+		err := r.db.First(&analysisRequest, "request_id = ? AND status = ?", requestId, "REGISTERED")
+		if err.Error != nil {
+			return err.Error
+		}
 	}
 
 	analysisRequest.Status = status
@@ -234,7 +265,7 @@ func (r *Repo) UpdateAnalysisRequestStatus(requestId int, status string) error {
 	return res.Error
 }
 
-func (r *Repo) DeleteModelingFromRequest(userId, modelingId int) (models.AnalysisRequest, []models.Modeling, error) {
+func (r *Repo) DeleteModelingFromRequest(userId, modelingId int) (models.AnalysisRequest, []models.ModelingInRequestMessage, error) {
 	var request models.AnalysisRequest
 	r.db.Where("user_id = ? and status = 'DRAFT'", userId).First(&request)
 
