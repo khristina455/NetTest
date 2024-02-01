@@ -73,8 +73,8 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		apiGroup.PUT("/analysis-requests/:id/admin", h.WithAuthCheck([]models.Role{models.Admin}), h.UpdateStatusAdmin)
 		apiGroup.DELETE("/analysis-requests", h.WithAuthCheck([]models.Role{models.Client}), h.DeleteRequest)
 
-		apiGroup.DELETE("/modelings/:id/requests", h.WithAuthCheck([]models.Role{models.Client}), h.DeleteModelingFromRequest)
-		apiGroup.PUT("/modelings/:id/requests", h.WithAuthCheck([]models.Role{models.Client}), h.UpdateModelingRequest)
+		apiGroup.DELETE("/analysis-requests/modelings/:id", h.WithAuthCheck([]models.Role{models.Client}), h.DeleteModelingFromRequest)
+		apiGroup.PUT("/analysis-requests/modelings/:id", h.WithAuthCheck([]models.Role{models.Client}), h.UpdateModelingRequest)
 
 		apiGroup.POST("/signIn", h.SignIn)
 		apiGroup.POST("/signUp", h.SignUp)
@@ -310,7 +310,6 @@ func (h *Handler) AddModelingToRequest(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err)
 		return
 	}
-	request.UserId = models.GetClientId()
 
 	err = h.repo.AddModelingToRequest(request)
 
