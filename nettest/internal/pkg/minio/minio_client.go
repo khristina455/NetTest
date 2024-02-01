@@ -46,10 +46,7 @@ func InitConfig() MinioConfig {
 }
 
 func NewMinioClient(ctx context.Context, config MinioConfig) (Client, error) {
-	minioClient, err := minio.New(config.Host, &minio.Options{
-		Creds: credentials.NewStaticV4(config.AccessKeyID, config.SecretAccessKey, ""),
-	})
-
+	minioClient, err := minio.New(config.Host, &minio.Options{Creds: credentials.NewStaticV4(config.AccessKeyID, config.SecretAccessKey, "")})
 	if err != nil {
 		return nil, err
 	}

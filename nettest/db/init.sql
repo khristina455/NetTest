@@ -17,7 +17,7 @@ CREATE TABLE modelings
     modeling_id       serial          PRIMARY KEY,
     name              varchar(60)     NOT NULL,
     description       text            NOT NULL,
-    image             text            NOT NULL,
+    image             text            ,
     is_deleted        boolean         NOT NULL,
     price             decimal(30, 2)  NOT NULL
 );

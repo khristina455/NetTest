@@ -5,11 +5,13 @@ import "time"
 type AnalysisRequest struct {
 	RequestId     int `gorm:"primaryKey"`
 	UserId        int
+	User          string
 	Status        string
 	CreationDate  time.Time
 	FormationDate time.Time
 	CompleteDate  time.Time
 	AdminId       int `gorm:"default:null"`
+	Admin         string
 }
 
 type RequestCreateMessage struct {
@@ -20,7 +22,7 @@ type RequestCreateMessage struct {
 
 type ModelingInRequestMessage struct {
 	ModelingId     int     `json:"modelingId"`
-	Name           string  `json:"name""`
+	Name           string  `json:"name"`
 	Description    string  `json:"description"`
 	Image          string  `json:"image"`
 	IsDeleted      bool    `json:"isDeleted"`

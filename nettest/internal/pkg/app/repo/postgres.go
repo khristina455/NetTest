@@ -52,8 +52,13 @@ func (r *Repo) DeleteModelingByID(modelingId int) error {
 	return nil
 }
 
-func (r *Repo) GetModelings(from, to int) ([]models.Modeling, error) {
+func (r *Repo) GetModelings(query string, from, to int) ([]models.Modeling, error) {
 	modelings := make([]models.Modeling, 0)
+
+	if query != "" {
+		res := r.db.Where("is_deleted = ?", "false").Where("name LIKE ? AND price BETWEEN ? AND ?", "%"+query+"%", from, to).Find(&modelings)
+		return modelings, res.Error
+	}
 
 	r.db.Where("is_deleted = ? AND price >= ? AND ? >= price", false, from, to).Find(&modelings)
 
@@ -141,59 +146,85 @@ func (r *Repo) AddModelingToRequest(modeling models.RequestCreateMessage) error 
 	return res.Error
 }
 
-func (r *Repo) GetAnalysisRequests(status string, startDate, endDate time.Time) ([]models.AnalysisRequest, error) {
+func (r *Repo) GetUsersLoginForRequests(analysisRequests []models.AnalysisRequest) ([]models.AnalysisRequest, error) {
+	for i := range analysisRequests {
+		var user models.User
+		r.db.Select("login").Where("user_id = ?", analysisRequests[i].UserId).First(&user)
+		analysisRequests[i].User = user.Login
+		fmt.Println(analysisRequests[i].User)
+
+		r.db.Select("login").Where("user_id = ?", analysisRequests[i].AdminId).First(&user)
+		analysisRequests[i].Admin = user.Login
+		fmt.Println(analysisRequests[i].Admin)
+	}
+	return analysisRequests, nil
+}
+
+func (r *Repo) GetAnalysisRequests(status string, startDate, endDate time.Time, userId int, isAdmin bool) ([]models.AnalysisRequest, error) {
 	var analysisRequests []models.AnalysisRequest
+	ending := "AND creator_id = " + strconv.Itoa(userId)
+	if isAdmin {
+		ending = ""
+	}
 
 	if status != "" {
 		if startDate.IsZero() {
 			if endDate.IsZero() {
-				res := r.db.Where("status != ? AND status != ?", "DRAFT", "DELETED").Where("status = ?", status).Find(&analysisRequests)
+				res := r.db.Where("status != ? AND status != ?"+ending, "DRAFT", "DELETED").Where("status = ?", status).Find(&analysisRequests)
+				analysisRequests, _ = r.GetUsersLoginForRequests(analysisRequests)
 				return analysisRequests, res.Error
 			}
 
-			res := r.db.Where("status != ? AND status != ?", "DRAFT", "DELETED").Where("status = ?", status).Where("formation_date < ?", endDate).
+			res := r.db.Where("status != ? AND status != ?"+ending, "DRAFT", "DELETED").Where("status = ?", status).Where("formation_date < ?", endDate).
 				Find(&analysisRequests)
+			analysisRequests, _ = r.GetUsersLoginForRequests(analysisRequests)
 			return analysisRequests, res.Error
 		}
 
 		if endDate.IsZero() {
-			res := r.db.Where("status != ? AND status != ?", "DRAFT", "DELETED").Where("status = ?", status).Where("formation_date > ?", startDate).
+			res := r.db.Where("status != ? AND status != ?"+ending, "DRAFT", "DELETED").Where("status = ?", status).Where("formation_date > ?", startDate).
 				Find(&analysisRequests)
+			analysisRequests, _ = r.GetUsersLoginForRequests(analysisRequests)
 			return analysisRequests, res.Error
 		}
 
-		res := r.db.Where("status != ? AND status != ?", "DRAFT", "DELETED").Where("status = ?", status).Where("formation_date BETWEEN ? AND ?", startDate, endDate).
+		res := r.db.Where("status != ? AND status != ?"+ending, "DRAFT", "DELETED").Where("status = ?", status).Where("formation_date BETWEEN ? AND ?", startDate, endDate).
 			Find(&analysisRequests)
+		analysisRequests, _ = r.GetUsersLoginForRequests(analysisRequests)
 		return analysisRequests, res.Error
 	}
 
 	if startDate.IsZero() {
 		if endDate.IsZero() {
 			// без фильтрации
-			res := r.db.Where("status != ? AND status != ?", "DRAFT", "DELETED").Find(&analysisRequests)
+			res := r.db.Where("status != ? AND status != ?"+ending, "DRAFT", "DELETED").Find(&analysisRequests)
+			analysisRequests, _ = r.GetUsersLoginForRequests(analysisRequests)
 			return analysisRequests, res.Error
 		}
 
 		// фильтрация по endDate
-		res := r.db.Where("status != ? AND status != ?", "DRAFT", "DELETED").Where("formation_date < ?", endDate).
+		res := r.db.Where("status != ? AND status != ?"+ending, "DRAFT", "DELETED").Where("formation_date < ?", endDate).
 			Find(&analysisRequests)
+		analysisRequests, _ = r.GetUsersLoginForRequests(analysisRequests)
 		return analysisRequests, res.Error
 	}
 
 	if endDate.IsZero() {
 		// фильтрация по startDate
-		res := r.db.Where("status != ? AND status != ?", "DRAFT", "DELETED").Where("formation_date > ?", startDate).
+		res := r.db.Where("status != ? AND status != ?"+ending, "DRAFT", "DELETED").Where("formation_date > ?", startDate).
 			Find(&analysisRequests)
+		analysisRequests, _ = r.GetUsersLoginForRequests(analysisRequests)
 		return analysisRequests, res.Error
 	}
 
 	//фильтрация по startDate и endDate
-	res := r.db.Where("status != ? AND status != ?", "DRAFT", "DELETED").Where("formation_date BETWEEN ? AND ?", startDate, endDate).
+	res := r.db.Where("status != ? AND status != ?"+ending, "DRAFT", "DELETED").Where("formation_date BETWEEN ? AND ?", startDate, endDate).
 		Find(&analysisRequests)
+	analysisRequests, _ = r.GetUsersLoginForRequests(analysisRequests)
 	return analysisRequests, res.Error
 }
 
-func (r *Repo) GetAnalysisRequestById(requestId int) (models.AnalysisRequest, []models.ModelingInRequestMessage, error) {
+func (r *Repo) GetAnalysisRequestById(requestId int, userId int, isAdmin bool) (models.AnalysisRequest, []models.ModelingInRequestMessage, error) {
 	var analysisRequest models.AnalysisRequest
 	var modelings []models.Modeling
 	var requestModeling []models.AnalysisRequestsModeling
@@ -202,6 +233,10 @@ func (r *Repo) GetAnalysisRequestById(requestId int) (models.AnalysisRequest, []
 	result := r.db.First(&analysisRequest, "request_id =?", requestId)
 	if result.Error != nil {
 		return models.AnalysisRequest{}, nil, result.Error
+	}
+
+	if !isAdmin && analysisRequest.UserId != userId {
+		return models.AnalysisRequest{}, nil, errors.New("ошибка доступа к данной заявке")
 	}
 
 	res := r.db.
@@ -238,28 +273,49 @@ func (r *Repo) GetAnalysisRequestById(requestId int) (models.AnalysisRequest, []
 	return analysisRequest, modelingsWithFields, nil
 }
 
-func (r *Repo) UpdateAnalysisRequestStatus(requestId int, status string) error {
+func (r *Repo) DeleteAnalysisRequest(userId int) error {
+	var request models.AnalysisRequest
+	res := r.db.First(&request, "user_id =? and status = 'DRAFT'", userId)
+	if res.Error != nil {
+		return res.Error
+	}
+
+	request.Status = "DELETED"
+	result := r.db.Save(request)
+	return result.Error
+}
+
+func (r *Repo) UpdateAnalysisRequestStatusClient(userId int, status string) error {
 	var analysisRequest models.AnalysisRequest
 
-	if requestId == 0 {
-		err := r.db.First(&analysisRequest, "user_id = ? AND status = ?", models.GetClientId(), "DRAFT")
-		if err.Error != nil {
-			return err.Error
-		}
-	} else {
-		err := r.db.First(&analysisRequest, "request_id = ? AND status = ?", requestId, "REGISTERED")
-		if err.Error != nil {
-			return err.Error
-		}
+	err := r.db.First(&analysisRequest, "user_id = ? AND status = ?", userId, "DRAFT")
+	if err.Error != nil {
+		return err.Error
 	}
 
 	analysisRequest.Status = status
 	if status == "REGISTERED" {
 		analysisRequest.FormationDate = time.Now()
 	}
+
+	res := r.db.Save(&analysisRequest)
+
+	return res.Error
+}
+
+func (r *Repo) UpdateAnalysisRequestStatusAdmin(reqId int, status string) error {
+	var analysisRequest models.AnalysisRequest
+
+	err := r.db.First(&analysisRequest, "request_id = ? AND status = ?", reqId, "REGISTERED")
+	if err.Error != nil {
+		return err.Error
+	}
+
+	analysisRequest.Status = status
 	if status == "COMPLETE" {
 		analysisRequest.CompleteDate = time.Now()
 	}
+
 	res := r.db.Save(&analysisRequest)
 
 	return res.Error
@@ -286,7 +342,7 @@ func (r *Repo) DeleteModelingFromRequest(userId, modelingId int) (models.Analysi
 		return models.AnalysisRequest{}, nil, err
 	}
 
-	return r.GetAnalysisRequestById(request.RequestId)
+	return r.GetAnalysisRequestById(request.RequestId, userId, false)
 }
 
 func (r *Repo) UpdateModelingRequest(userId int, updateModelingRequest models.AnalysisRequestsModeling) error {
@@ -325,5 +381,10 @@ func (r *Repo) SignUp(newUser models.User) error {
 
 func (r *Repo) GetByCredentials(user models.User) (models.User, error) {
 	err := r.db.First(&user, "login = ? AND password = ?", user.Login, user.Password).Error
+	return user, err
+}
+
+func (r *Repo) GetUserInfo(user models.User) (models.User, error) {
+	err := r.db.First(&user, "user_id = ?", user.UserId).Error
 	return user, err
 }

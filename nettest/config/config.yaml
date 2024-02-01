@@ -7,3 +7,8 @@ minio:
   accessKeyId: "khristina_admin"
   secretAccessKey: "23042003"
   bucketName: "modelings"
+
+
+redis:
+  dialTimeout: "10s"
+  readTimeout: "10s"

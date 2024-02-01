@@ -1,0 +1,844 @@
+{
+    "schemes": [
+        "http"
+    ],
+    "swagger": "2.0",
+    "info": {
+        "description": "App for analyze networks payload",
+        "title": "AnalyzeNetworkApp",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/",
+    "paths": {
+        "/api/analysis-requests": {
+            "get": {
+                "description": "Retrieves a list of analysis requests based on the provided parameters",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AnalysisRequests"
+                ],
+                "summary": "Get list of analysis requests",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Analysis request status",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Start date in the format '2006-01-02T15:04:05Z'",
+                        "name": "start_date",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "End date in the format '2006-01-02T15:04:05Z'",
+                        "name": "end_date",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.AnalysisRequest"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {}
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {}
+                    }
+                }
+            }
+        },
+        "/api/analysis-requests/client": {
+            "put": {
+                "description": "Updates the status of an analysis request by client on registered",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AnalysisRequests"
+                ],
+                "summary": "Update analysis request status by client",
+                "parameters": [
+                    {
+                        "description": "New status of the analysis request",
+                        "name": "status",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.AnalysisRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {}
+                    }
+                }
+            }
+        },
+        "/api/analysis-requests/{id}": {
+            "get": {
+                "description": "Retrieves an analysis request with the given ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AnalysisRequests"
+                ],
+                "summary": "Get analysis request by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Analysis Request ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {}
+                    }
+                }
+            }
+        },
+        "/api/analysis-requests/{requestId}": {
+            "delete": {
+                "description": "Deletes an analysis request for the given user ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AnalysisRequests"
+                ],
+                "summary": "Delete analysis request by user ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User ID",
+                        "name": "user_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {}
+                    }
+                }
+            }
+        },
+        "/api/analysis-requests/{requestId}/admin": {
+            "put": {
+                "description": "Updates the status of an analysis request with the given ID on \"COMPLETE\"/\"CANCELED\"",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AnalysisRequests"
+                ],
+                "summary": "Update analysis request status by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Request ID",
+                        "name": "requestId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "New request status",
+                        "name": "status",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.AnalysisRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {}
+                    }
+                }
+            }
+        },
+        "/api/check-auth": {
+            "get": {
+                "description": "Retrieves user information based on the provided user context",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Check user authentication",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.User"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/logout": {
+            "post": {
+                "description": "Logs out the user by blacklisting the access token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Logout",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    }
+                }
+            }
+        },
+        "/api/modelings": {
+            "get": {
+                "description": "Retrieves a list of modelings based on the provided parameters",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Modelings"
+                ],
+                "summary": "Get list of modelings",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Query string to filter modelings",
+                        "name": "query",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {}
+                    }
+                }
+            },
+            "post": {
+                "description": "Add a new modeling with image, name, description, and price",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Modelings"
+                ],
+                "summary": "Add new modeling",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "Modeling image",
+                        "name": "image",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Modeling name",
+                        "name": "name",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Modeling description",
+                        "name": "description",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Modeling price",
+                        "name": "price",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/modelings/request": {
+            "post": {
+                "description": "Adds a modeling to analysis request",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Modelings"
+                ],
+                "summary": "Add modeling to request",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Modeling ID",
+                        "name": "modelingId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {}
+                    }
+                }
+            }
+        },
+        "/api/modelings/{id}": {
+            "get": {
+                "description": "Retrieves a modeling by its ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Modelings"
+                ],
+                "summary": "Get modeling by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Modeling ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Modeling"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {}
+                    }
+                }
+            },
+            "put": {
+                "description": "Updates a modeling with the given ID",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Modelings"
+                ],
+                "summary": "Update modeling by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "name",
+                        "name": "name",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "description",
+                        "name": "description",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "price",
+                        "name": "price",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "file",
+                        "description": "image",
+                        "name": "image",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {}
+                    }
+                }
+            },
+            "delete": {
+                "description": "Deletes a modeling with the given ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Modelings"
+                ],
+                "summary": "Delete modeling by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Modeling ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {}
+                    }
+                }
+            }
+        },
+        "/api/modelings/{modelingId}/requests": {
+            "put": {
+                "description": "Updates a request_modeling the given ID",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "RequestsModelings"
+                ],
+                "summary": "Update request_modeling by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "nodeQuantity",
+                        "name": "nodeQuantity",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "queueSize",
+                        "name": "queueSize",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "clientQuantity",
+                        "name": "clientQuantity",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {}
+                    }
+                }
+            },
+            "delete": {
+                "description": "Deletes a modeling from a request based on the user ID and threat ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AnalysisRequests"
+                ],
+                "summary": "Delete modeling from request",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Modeling ID",
+                        "name": "modelingId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {}
+                    }
+                }
+            }
+        },
+        "/api/signIn": {
+            "post": {
+                "description": "Authenticates a user and generates an access token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "User sign-in",
+                "parameters": [
+                    {
+                        "description": "User information",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.UserLogin"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {}
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {}
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {}
+                    }
+                }
+            }
+        },
+        "/api/signUp": {
+            "post": {
+                "description": "Creates a new user account",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Sign up a new user",
+                "parameters": [
+                    {
+                        "description": "User information",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.UserSignUp"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {}
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {}
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {}
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "models.AnalysisRequest": {
+            "type": "object",
+            "properties": {
+                "admin": {
+                    "type": "string"
+                },
+                "adminId": {
+                    "type": "integer"
+                },
+                "completeDate": {
+                    "type": "string"
+                },
+                "creationDate": {
+                    "type": "string"
+                },
+                "formationDate": {
+                    "type": "string"
+                },
+                "requestId": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "user": {
+                    "type": "string"
+                },
+                "userId": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.Modeling": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "image": {
+                    "type": "string"
+                },
+                "isDeleted": {
+                    "type": "boolean"
+                },
+                "modelingId": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "number"
+                }
+            }
+        },
+        "models.User": {
+            "type": "object",
+            "properties": {
+                "isAdmin": {
+                    "type": "boolean"
+                },
+                "login": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "userId": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.UserLogin": {
+            "type": "object",
+            "required": [
+                "login",
+                "password"
+            ],
+            "properties": {
+                "login": {
+                    "type": "string",
+                    "maxLength": 64
+                },
+                "password": {
+                    "type": "string",
+                    "maxLength": 64,
+                    "minLength": 8
+                }
+            }
+        },
+        "models.UserSignUp": {
+            "type": "object",
+            "required": [
+                "login",
+                "password"
+            ],
+            "properties": {
+                "login": {
+                    "type": "string",
+                    "maxLength": 64
+                },
+                "password": {
+                    "type": "string",
+                    "maxLength": 64,
+                    "minLength": 8
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,571 @@
+basePath: /
+definitions:
+  models.AnalysisRequest:
+    properties:
+      admin:
+        type: string
+      adminId:
+        type: integer
+      completeDate:
+        type: string
+      creationDate:
+        type: string
+      formationDate:
+        type: string
+      requestId:
+        type: integer
+      status:
+        type: string
+      user:
+        type: string
+      userId:
+        type: integer
+    type: object
+  models.Modeling:
+    properties:
+      description:
+        type: string
+      image:
+        type: string
+      isDeleted:
+        type: boolean
+      modelingId:
+        type: integer
+      name:
+        type: string
+      price:
+        type: number
+    type: object
+  models.User:
+    properties:
+      isAdmin:
+        type: boolean
+      login:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      userId:
+        type: integer
+    type: object
+  models.UserLogin:
+    properties:
+      login:
+        maxLength: 64
+        type: string
+      password:
+        maxLength: 64
+        minLength: 8
+        type: string
+    required:
+    - login
+    - password
+    type: object
+  models.UserSignUp:
+    properties:
+      login:
+        maxLength: 64
+        type: string
+      password:
+        maxLength: 64
+        minLength: 8
+        type: string
+    required:
+    - login
+    - password
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: App for analyze networks payload
+  title: AnalyzeNetworkApp
+  version: "1.0"
+paths:
+  /api/analysis-requests:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a list of analysis requests based on the provided parameters
+      parameters:
+      - description: Analysis request status
+        in: query
+        name: status
+        type: string
+      - description: Start date in the format '2006-01-02T15:04:05Z'
+        in: query
+        name: start_date
+        type: string
+      - description: End date in the format '2006-01-02T15:04:05Z'
+        in: query
+        name: end_date
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.AnalysisRequest'
+            type: array
+        "400":
+          description: Bad Request
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Get list of analysis requests
+      tags:
+      - AnalysisRequests
+  /api/analysis-requests/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves an analysis request with the given ID
+      parameters:
+      - description: Analysis Request ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema: {}
+      summary: Get analysis request by ID
+      tags:
+      - AnalysisRequests
+  /api/analysis-requests/{requestId}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes an analysis request for the given user ID
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema: {}
+      summary: Delete analysis request by user ID
+      tags:
+      - AnalysisRequests
+  /api/analysis-requests/{requestId}/admin:
+    put:
+      consumes:
+      - application/json
+      description: Updates the status of an analysis request with the given ID on
+        "COMPLETE"/"CANCELED"
+      parameters:
+      - description: Request ID
+        in: path
+        name: requestId
+        required: true
+        type: integer
+      - description: New request status
+        in: body
+        name: status
+        required: true
+        schema:
+          $ref: '#/definitions/models.AnalysisRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema: {}
+      summary: Update analysis request status by ID
+      tags:
+      - AnalysisRequests
+  /api/analysis-requests/client:
+    put:
+      consumes:
+      - application/json
+      description: Updates the status of an analysis request by client on registered
+      parameters:
+      - description: New status of the analysis request
+        in: body
+        name: status
+        required: true
+        schema:
+          $ref: '#/definitions/models.AnalysisRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema: {}
+      summary: Update analysis request status by client
+      tags:
+      - AnalysisRequests
+  /api/check-auth:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves user information based on the provided user context
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.User'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Check user authentication
+      tags:
+      - Authentication
+  /api/logout:
+    post:
+      consumes:
+      - application/json
+      description: Logs out the user by blacklisting the access token
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      summary: Logout
+      tags:
+      - Authentication
+  /api/modelings:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a list of modelings based on the provided parameters
+      parameters:
+      - description: Query string to filter modelings
+        in: query
+        name: query
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Get list of modelings
+      tags:
+      - Modelings
+    post:
+      consumes:
+      - multipart/form-data
+      description: Add a new modeling with image, name, description, and price
+      parameters:
+      - description: Modeling image
+        in: formData
+        name: image
+        required: true
+        type: file
+      - description: Modeling name
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: Modeling description
+        in: formData
+        name: description
+        type: string
+      - description: Modeling price
+        in: formData
+        name: price
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Add new modeling
+      tags:
+      - Modelings
+  /api/modelings/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a modeling with the given ID
+      parameters:
+      - description: Modeling ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema: {}
+      summary: Delete modeling by ID
+      tags:
+      - Modelings
+    get:
+      description: Retrieves a modeling by its ID
+      parameters:
+      - description: Modeling ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Modeling'
+        "400":
+          description: Bad Request
+          schema: {}
+      summary: Get modeling by ID
+      tags:
+      - Modelings
+    put:
+      consumes:
+      - multipart/form-data
+      description: Updates a modeling with the given ID
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: name
+        in: formData
+        name: name
+        type: string
+      - description: description
+        in: formData
+        name: description
+        type: string
+      - description: price
+        in: formData
+        name: price
+        type: string
+      - description: image
+        in: formData
+        name: image
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema: {}
+      summary: Update modeling by ID
+      tags:
+      - Modelings
+  /api/modelings/{modelingId}/requests:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a modeling from a request based on the user ID and threat
+        ID
+      parameters:
+      - description: Modeling ID
+        in: path
+        name: modelingId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema: {}
+      summary: Delete modeling from request
+      tags:
+      - AnalysisRequests
+    put:
+      consumes:
+      - multipart/form-data
+      description: Updates a request_modeling the given ID
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: nodeQuantity
+        in: formData
+        name: nodeQuantity
+        type: string
+      - description: queueSize
+        in: formData
+        name: queueSize
+        type: string
+      - description: clientQuantity
+        in: formData
+        name: clientQuantity
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema: {}
+      summary: Update request_modeling by ID
+      tags:
+      - RequestsModelings
+  /api/modelings/request:
+    post:
+      consumes:
+      - application/json
+      description: Adds a modeling to analysis request
+      parameters:
+      - description: Modeling ID
+        in: path
+        name: modelingId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema: {}
+      summary: Add modeling to request
+      tags:
+      - Modelings
+  /api/signIn:
+    post:
+      consumes:
+      - application/json
+      description: Authenticates a user and generates an access token
+      parameters:
+      - description: User information
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.UserLogin'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema: {}
+        "401":
+          description: Unauthorized
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: User sign-in
+      tags:
+      - Authentication
+  /api/signUp:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new user account
+      parameters:
+      - description: User information
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.UserSignUp'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema: {}
+        "409":
+          description: Conflict
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Sign up a new user
+      tags:
+      - Authentication
+schemes:
+- http
+swagger: "2.0"
