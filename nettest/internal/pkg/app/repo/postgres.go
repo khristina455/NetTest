@@ -162,7 +162,7 @@ func (r *Repo) GetUsersLoginForRequests(analysisRequests []models.AnalysisReques
 
 func (r *Repo) GetAnalysisRequests(status string, startDate, endDate time.Time, userId int, isAdmin bool) ([]models.AnalysisRequest, error) {
 	var analysisRequests []models.AnalysisRequest
-	ending := "AND creator_id = " + strconv.Itoa(userId)
+	ending := "AND user_id = " + strconv.Itoa(userId)
 	if isAdmin {
 		ending = ""
 	}

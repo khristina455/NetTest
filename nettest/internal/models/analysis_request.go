@@ -3,15 +3,15 @@ package models
 import "time"
 
 type AnalysisRequest struct {
-	RequestId     int `gorm:"primaryKey"`
-	UserId        int
-	User          string
-	Status        string
-	CreationDate  time.Time
-	FormationDate time.Time
-	CompleteDate  time.Time
-	AdminId       int `gorm:"default:null"`
-	Admin         string
+	RequestId     int       `gorm:"primaryKey" json:"requestId"`
+	UserId        int       `json:"userId"`
+	User          string    `json:"user"`
+	Status        string    `json:"status"`
+	CreationDate  time.Time `json:"creationDate"`
+	FormationDate time.Time `json:"formationDate"`
+	CompleteDate  time.Time `json:"completeDate"`
+	AdminId       int       `gorm:"default:null" json:"adminId"`
+	Admin         string    `json:"admin"`
 }
 
 type RequestCreateMessage struct {

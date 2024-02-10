@@ -67,6 +67,32 @@ const docTemplate = `{
                         "schema": {}
                     }
                 }
+            },
+            "delete": {
+                "description": "Deletes an analysis request for the given user ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AnalysisRequests"
+                ],
+                "summary": "Delete analysis request by user ID",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {}
+                    }
+                }
             }
         },
         "/api/analysis-requests/client": {
@@ -110,9 +136,62 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/analysis-requests/{id}": {
-            "get": {
-                "description": "Retrieves an analysis request with the given ID",
+        "/api/analysis-requests/modelings/{modelingId}": {
+            "put": {
+                "description": "Updates a request_modeling the given ID",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "RequestsModelings"
+                ],
+                "summary": "Update request_modeling by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "nodeQuantity",
+                        "name": "nodeQuantity",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "queueSize",
+                        "name": "queueSize",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "clientQuantity",
+                        "name": "clientQuantity",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {}
+                    }
+                }
+            },
+            "delete": {
+                "description": "Deletes a modeling from a request based on the user ID and modeling ID",
                 "consumes": [
                     "application/json"
                 ],
@@ -122,12 +201,12 @@ const docTemplate = `{
                 "tags": [
                     "AnalysisRequests"
                 ],
-                "summary": "Get analysis request by ID",
+                "summary": "Delete modeling from request",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "Analysis Request ID",
-                        "name": "id",
+                        "description": "Modeling ID",
+                        "name": "modelingId",
                         "in": "path",
                         "required": true
                     }
@@ -147,9 +226,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/analysis-requests/{requestId}": {
-            "delete": {
-                "description": "Deletes an analysis request for the given user ID",
+        "/api/analysis-requests/{id}": {
+            "get": {
+                "description": "Retrieves an analysis request with the given ID",
                 "consumes": [
                     "application/json"
                 ],
@@ -159,12 +238,12 @@ const docTemplate = `{
                 "tags": [
                     "AnalysisRequests"
                 ],
-                "summary": "Delete analysis request by user ID",
+                "summary": "Get analysis request by ID",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "User ID",
-                        "name": "user_id",
+                        "description": "Analysis Request ID",
+                        "name": "id",
                         "in": "path",
                         "required": true
                     }
@@ -300,6 +379,18 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Query string to filter modelings",
                         "name": "query",
+                        "in": "query"
+                    },
+                    {
+                        "type": "number",
+                        "description": "LowPrice to filter modelings",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "number",
+                        "description": "HighPrice string to filter modelings",
+                        "name": "to",
                         "in": "query"
                     }
                 ],
@@ -527,96 +618,6 @@ const docTemplate = `{
                         "type": "integer",
                         "description": "Modeling ID",
                         "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {}
-                    }
-                }
-            }
-        },
-        "/api/modelings/{modelingId}/requests": {
-            "put": {
-                "description": "Updates a request_modeling the given ID",
-                "consumes": [
-                    "multipart/form-data"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "RequestsModelings"
-                ],
-                "summary": "Update request_modeling by ID",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "nodeQuantity",
-                        "name": "nodeQuantity",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "queueSize",
-                        "name": "queueSize",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "clientQuantity",
-                        "name": "clientQuantity",
-                        "in": "formData"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {}
-                    }
-                }
-            },
-            "delete": {
-                "description": "Deletes a modeling from a request based on the user ID and threat ID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "AnalysisRequests"
-                ],
-                "summary": "Delete modeling from request",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Modeling ID",
-                        "name": "modelingId",
                         "in": "path",
                         "required": true
                     }

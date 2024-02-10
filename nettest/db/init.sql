@@ -26,7 +26,7 @@ create table analysis_requests
 (
     request_id         serial          PRIMARY KEY,
     user_id            int,
-    status             varchar(20)     CHECK (status IN ('DRAFT', 'REGISTERED', 'IN WORK', 'COMPLETE', 'CANCELED', 'DELETED')) DEFAULT 'DRAFT',
+    status             varchar(20)     CHECK (status IN ('DRAFT', 'REGISTERED', 'COMPLETE', 'CANCELED', 'DELETED')) DEFAULT 'DRAFT',
     creation_date      timestamp       default now() not null,
     formation_date     timestamp,
     complete_date      timestamp,

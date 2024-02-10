@@ -83,6 +83,24 @@ info:
   version: "1.0"
 paths:
   /api/analysis-requests:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes an analysis request for the given user ID
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema: {}
+      summary: Delete analysis request by user ID
+      tags:
+      - AnalysisRequests
     get:
       consumes:
       - application/json
@@ -141,31 +159,6 @@ paths:
           description: Bad Request
           schema: {}
       summary: Get analysis request by ID
-      tags:
-      - AnalysisRequests
-  /api/analysis-requests/{requestId}:
-    delete:
-      consumes:
-      - application/json
-      description: Deletes an analysis request for the given user ID
-      parameters:
-      - description: User ID
-        in: path
-        name: user_id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema: {}
-      summary: Delete analysis request by user ID
       tags:
       - AnalysisRequests
   /api/analysis-requests/{requestId}/admin:
@@ -227,6 +220,68 @@ paths:
       summary: Update analysis request status by client
       tags:
       - AnalysisRequests
+  /api/analysis-requests/modelings/{modelingId}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a modeling from a request based on the user ID and modeling
+        ID
+      parameters:
+      - description: Modeling ID
+        in: path
+        name: modelingId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema: {}
+      summary: Delete modeling from request
+      tags:
+      - AnalysisRequests
+    put:
+      consumes:
+      - multipart/form-data
+      description: Updates a request_modeling the given ID
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: nodeQuantity
+        in: formData
+        name: nodeQuantity
+        type: string
+      - description: queueSize
+        in: formData
+        name: queueSize
+        type: string
+      - description: clientQuantity
+        in: formData
+        name: clientQuantity
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema: {}
+      summary: Update request_modeling by ID
+      tags:
+      - RequestsModelings
   /api/check-auth:
     get:
       consumes:
@@ -271,6 +326,14 @@ paths:
         in: query
         name: query
         type: string
+      - description: LowPrice to filter modelings
+        in: query
+        name: from
+        type: number
+      - description: HighPrice string to filter modelings
+        in: query
+        name: to
+        type: number
       produces:
       - application/json
       responses:
@@ -415,68 +478,6 @@ paths:
       summary: Update modeling by ID
       tags:
       - Modelings
-  /api/modelings/{modelingId}/requests:
-    delete:
-      consumes:
-      - application/json
-      description: Deletes a modeling from a request based on the user ID and threat
-        ID
-      parameters:
-      - description: Modeling ID
-        in: path
-        name: modelingId
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema: {}
-      summary: Delete modeling from request
-      tags:
-      - AnalysisRequests
-    put:
-      consumes:
-      - multipart/form-data
-      description: Updates a request_modeling the given ID
-      parameters:
-      - description: ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: nodeQuantity
-        in: formData
-        name: nodeQuantity
-        type: string
-      - description: queueSize
-        in: formData
-        name: queueSize
-        type: string
-      - description: clientQuantity
-        in: formData
-        name: clientQuantity
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema: {}
-      summary: Update request_modeling by ID
-      tags:
-      - RequestsModelings
   /api/modelings/request:
     post:
       consumes:

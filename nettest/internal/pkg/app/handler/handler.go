@@ -75,11 +75,12 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 		apiGroup.DELETE("/analysis-requests/modelings/:id", h.WithAuthCheck([]models.Role{models.Client}), h.DeleteModelingFromRequest)
 		apiGroup.PUT("/analysis-requests/modelings/:id", h.WithAuthCheck([]models.Role{models.Client}), h.UpdateModelingRequest)
+		//apiGroup.GET("/analysis-requests/modelings/:id", h.WithAuthCheck([]models.Role{models.Client}), h.GetModelingRequest)
 
 		apiGroup.POST("/signIn", h.SignIn)
 		apiGroup.POST("/signUp", h.SignUp)
 		apiGroup.POST("/logout", h.Logout)
-		apiGroup.GET("/checkAuth", h.WithAuthCheck([]models.Role{models.Client, models.Admin}), h.CheckAuth)
+		apiGroup.GET("/check-auth", h.WithAuthCheck([]models.Role{models.Client, models.Admin}), h.CheckAuth)
 	}
 
 	r.Static("/images", "./resources")
@@ -97,6 +98,8 @@ func (h *Handler) InitRoutes() *gin.Engine {
 // @Accept       json
 // @Produce      json
 // @Param        query   query    string  false  "Query string to filter modelings"
+// @Param        from   query    number  false  "LowPrice to filter modelings"
+// @Param        to   query    number  false  "HighPrice string to filter modelings"
 // @Success      200  {object}  map[string]any
 // @Failure      500  {object}  error
 // @Router       /api/modelings [get]
@@ -164,7 +167,7 @@ func (h *Handler) GetModeling(c *gin.Context) {
 // @Param        image formData file true "Modeling image"
 // @Param        name formData string true "Modeling name"
 // @Param        description formData string false "Modeling description"
-// @Param        price formData integer true "Modeling price"
+// @Param        price formData string true "Modeling price"
 // @Success      201  {string}  map[string]any
 // @Failure      400  {object}  map[string]any
 // @Failure      500  {object}  map[string]any
@@ -383,7 +386,7 @@ func (h *Handler) GetRequestsList(c *gin.Context) {
 // @Accept       json
 // @Produce      json
 // @Param        id  path  int  true  "Analysis Request ID"
-// @Success      200  {object}  map[string]any
+// @Success      200  {object}  map[string]any models.AnalysisRequest,models.ModelingInRequestMessage
 // @Failure      400  {object}  error
 // @Router       /api/analysis-requests/{id} [get]
 func (h *Handler) GetRequest(c *gin.Context) {
@@ -482,10 +485,9 @@ func (h *Handler) UpdateStatusAdmin(c *gin.Context) {
 // @Tags         AnalysisRequests
 // @Accept       json
 // @Produce      json
-// @Param        user_id  path  int  true  "User ID"
 // @Success      200  {object}  map[string]any
 // @Failure      400  {object}  error
-// @Router       /api/analysis-requests/{requestId} [delete]
+// @Router       /api/analysis-requests [delete]
 func (h *Handler) DeleteRequest(c *gin.Context) {
 	userId := c.GetInt(userCtx)
 	err := h.repo.DeleteAnalysisRequest(userId)
@@ -499,14 +501,14 @@ func (h *Handler) DeleteRequest(c *gin.Context) {
 
 // DeleteModelingFromRequest godoc
 // @Summary      Delete modeling from request
-// @Description  Deletes a modeling from a request based on the user ID and threat ID
+// @Description  Deletes a modeling from a request based on the user ID and modeling ID
 // @Tags         AnalysisRequests
 // @Accept       json
 // @Produce      json
 // @Param        modelingId  path  int  true  "Modeling ID"
 // @Success      200  {object}  map[string]interface{}
 // @Failure      400  {object}  error
-// @Router       /api/modelings/{modelingId}/requests [delete]
+// @Router       /api/analysis-requests/modelings/{modelingId} [delete]
 func (h *Handler) DeleteModelingFromRequest(c *gin.Context) {
 	modelingIdStr := c.Param("id")
 	modelingId, err := strconv.Atoi(modelingIdStr)
@@ -531,13 +533,13 @@ func (h *Handler) DeleteModelingFromRequest(c *gin.Context) {
 // @Tags         RequestsModelings
 // @Accept       multipart/form-data
 // @Produce      json
-// @Param        id          path        int     true        "ID"
+// @Param        modelingId          path        int     true        "Modeling ID"
 // @Param        nodeQuantity        formData    string  false       "nodeQuantity"
 // @Param        queueSize           formData    string  false       "queueSize"
 // @Param        clientQuantity      formData    string  false       "clientQuantity"
 // @Success      200         {object}    map[string]any
 // @Failure      400         {object}    error
-// @Router       /api/modelings/{modelingId}/requests [put]
+// @Router       /api/analysis-requests/modelings/{modelingId} [put]
 func (h *Handler) UpdateModelingRequest(c *gin.Context) {
 	var updateModelingRequest models.AnalysisRequestsModeling
 	var err error
