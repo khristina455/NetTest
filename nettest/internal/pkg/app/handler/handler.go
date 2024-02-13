@@ -1,6 +1,9 @@
 package handler
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
@@ -81,6 +84,8 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		apiGroup.POST("/signUp", h.SignUp)
 		apiGroup.POST("/logout", h.Logout)
 		apiGroup.GET("/check-auth", h.WithAuthCheck([]models.Role{models.Client, models.Admin}), h.CheckAuth)
+
+		apiGroup.PUT("/analysis-requests/write-result", h.WithAuthCheck([]models.Role{}), h.WriteResult)
 	}
 
 	r.Static("/images", "./resources")
@@ -429,11 +434,13 @@ func (h *Handler) UpdateStatusClient(c *gin.Context) {
 		return
 	}
 
-	err = h.repo.UpdateAnalysisRequestStatusClient(c.GetInt(userCtx), newRequestStatus.Status)
+	requestId, err := h.repo.UpdateAnalysisRequestStatusClient(c.GetInt(userCtx), newRequestStatus.Status)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
 	}
+
+	_ = h.CalcResults(requestId, c.GetInt(userCtx))
 
 	c.JSON(http.StatusOK, gin.H{"message": "Статус изменен"})
 }
@@ -470,7 +477,7 @@ func (h *Handler) UpdateStatusAdmin(c *gin.Context) {
 		return
 	}
 
-	err = h.repo.UpdateAnalysisRequestStatusAdmin(id, newRequestStatus.Status)
+	err = h.repo.UpdateAnalysisRequestStatusAdmin(c.GetInt(userCtx), id, newRequestStatus.Status)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
@@ -712,4 +719,60 @@ func (h *Handler) CheckAuth(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, userInfo)
+}
+
+func (h *Handler) WriteResult(c *gin.Context) {
+	var results models.ResponseAsyncService
+	var err error
+
+	if err = c.BindJSON(&results); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "неверный формат данных"})
+		return
+	}
+
+	for _, modeling := range results.Results {
+		err = h.repo.WriteResult(results.RequestId, modeling.ModelingId, modeling.Result)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "неверный формат данных"})
+			return
+		}
+
+	}
+
+	c.Status(http.StatusOK)
+}
+
+const (
+	ServerToken = "curliksienmlcld"
+	ServiceUrl  = "http://127.0.0.1:8081/calculate-result/"
+)
+
+func (h *Handler) CalcResults(requestId int, userID int) error {
+	var request models.RequestAsyncService
+
+	request.RequestId = requestId
+	request.Token = ServerToken
+	_, request.Modelings, _ = h.repo.GetAnalysisRequestById(requestId, userID, false)
+
+	body, _ := json.Marshal(request)
+
+	client := &http.Client{}
+	req, err := http.NewRequest("PUT", ServiceUrl, bytes.NewBuffer(body))
+	if err != nil {
+		fmt.Println("Error creating request:", err)
+		return err
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Println("Error sending request:", err)
+		return err
+	}
+
+	if resp.StatusCode == 200 {
+		return nil
+	}
+	return errors.New("заявка не принята в обработку")
 }

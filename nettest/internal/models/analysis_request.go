@@ -12,6 +12,7 @@ type AnalysisRequest struct {
 	CompleteDate  time.Time `json:"completeDate"`
 	AdminId       int       `gorm:"default:null" json:"adminId"`
 	Admin         string    `json:"admin"`
+	CountResults  int64     `json:"countResults"`
 }
 
 type RequestCreateMessage struct {
@@ -30,6 +31,7 @@ type ModelingInRequestMessage struct {
 	NodeQuantity   int     `json:"nodeQuantity"`
 	QueueSize      int     `json:"queueSize"`
 	ClientQuantity int     `json:"clientQuantity"`
+	Result         int     `json:"result"`
 }
 
 type AnalysisRequestsModeling struct {
@@ -38,4 +40,21 @@ type AnalysisRequestsModeling struct {
 	NodeQuantity   int
 	QueueSize      int
 	ClientQuantity int
+	Result         int
+}
+
+type RequestAsyncService struct {
+	RequestId int                        `json:"requestId"`
+	Token     string                     `json:"Server-Token"`
+	Modelings []ModelingInRequestMessage `json:"modelings"`
+}
+
+type ResponseModeling struct {
+	ModelingId int `json:"modelingId"`
+	Result     int `json:"result"`
+}
+
+type ResponseAsyncService struct {
+	RequestId int                `json:"requestId"`
+	Results   []ResponseModeling `json:"results"`
 }
