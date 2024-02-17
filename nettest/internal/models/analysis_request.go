@@ -58,3 +58,8 @@ type ResponseAsyncService struct {
 	RequestId int                `json:"requestId"`
 	Results   []ResponseModeling `json:"results"`
 }
+
+type StatisticMessage struct {
+	Value  int64  `json:"value"`
+	Legend string `json:"legend"`
+}

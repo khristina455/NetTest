@@ -86,6 +86,8 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		apiGroup.GET("/check-auth", h.WithAuthCheck([]models.Role{models.Client, models.Admin}), h.CheckAuth)
 
 		apiGroup.PUT("/analysis-requests/write-result", h.WithAuthCheck([]models.Role{}), h.WriteResult)
+
+		apiGroup.GET("/analysis-requests/statistics", h.WithAuthCheck([]models.Role{}), h.GetStatistics)
 	}
 
 	r.Static("/images", "./resources")
@@ -775,4 +777,10 @@ func (h *Handler) CalcResults(requestId int, userID int) error {
 		return nil
 	}
 	return errors.New("заявка не принята в обработку")
+}
+
+func (h *Handler) GetStatistics(c *gin.Context) {
+	statistic := h.repo.GetStatisticsForRequests()
+
+	c.JSON(http.StatusOK, gin.H{"statistic": statistic})
 }

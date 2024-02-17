@@ -426,3 +426,20 @@ func (r *Repo) WriteResult(requestId int, modelingId int, result int) error {
 	p := r.db.Save(modelingRequest)
 	return p.Error
 }
+
+func (r *Repo) GetStatisticsForRequests() []models.StatisticMessage {
+	var statistic []models.StatisticMessage
+	var usersModel []models.User
+	r.db.Find(&usersModel)
+	fmt.Println(usersModel)
+
+	for _, val := range usersModel {
+		var requests []models.AnalysisRequest
+		var cnt int64
+		r.db.Where("user_id = ?", val.UserId).Find(&requests).Count(&cnt)
+		statistic = append(statistic, models.StatisticMessage{cnt, val.Login})
+		fmt.Println(cnt, val.Login)
+	}
+
+	return statistic
+}

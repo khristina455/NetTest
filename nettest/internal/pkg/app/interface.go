@@ -25,4 +25,5 @@ type Repo interface {
 	GetByCredentials(user models.User) (models.User, error)
 	GetUserInfo(user models.User) (models.User, error)
 	WriteResult(requestId int, modelingId int, result int) error
+	GetStatisticsForRequests() []models.StatisticMessage
 }
