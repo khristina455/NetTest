@@ -15,3 +15,12 @@ type AnalysisRequest struct {
 	Result         float32
 	AdminId        int
 }
+
+type AnalysisRequestsModeling struct {
+	RequestId      int `gorm:"primaryKey"`
+	ModelingId     int `gorm:"primaryKey"`
+	NodeQuantity   int
+	QueueSize      int
+	ClientQuantity int
+	Result         int
+}

@@ -9,6 +9,8 @@ import (
 	"strconv"
 )
 
+const draftId int = 56
+
 type Handler struct {
 	repo app.Repo
 }
@@ -26,7 +28,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	r.GET("/", h.GetCardsList)
 	r.GET("/products/:id", h.GetCardById)
 	r.POST("/products/:id", h.DeleteCard)
-
+	r.GET("/requests/:id", h.GetRequest)
 	r.Static("/images", "./resources")
 	return r
 }
@@ -65,7 +67,27 @@ func (h *Handler) GetCardsList(c *gin.Context) {
 	fmt.Println(modelings)
 	c.HTML(http.StatusOK, "index.html", gin.H{
 		"title":    "Nettest",
+		"draft":    draftId,
 		"products": modelings,
+	})
+}
+
+func (h *Handler) GetRequest(c *gin.Context) {
+	requestId := c.Param("id")
+	id, err := strconv.Atoi(requestId)
+	if err != nil {
+		c.AbortWithError(http.StatusBadRequest, err)
+	}
+	request, modelings, err := h.repo.GetRequestById(id)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, err)
+		return
+	}
+
+	c.HTML(http.StatusOK, "cart.html", gin.H{
+		"title":     "Nettest",
+		"request":   request,
+		"modelings": modelings,
 	})
 }
 

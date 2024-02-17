@@ -8,3 +8,16 @@ type Modeling struct {
 	IsDeleted   bool
 	Price       float32
 }
+
+type ModelingInRequestMessage struct {
+	ModelingId     int
+	Name           string
+	Description    string
+	Image          string
+	IsDeleted      bool
+	Price          float32
+	NodeQuantity   int
+	QueueSize      int
+	ClientQuantity int
+	Result         int
+}

@@ -53,3 +53,49 @@ func (r *Repo) GetModelings(from, to int) ([]models.Modeling, error) {
 
 	return modelings, nil
 }
+
+func (r *Repo) GetRequestById(requestId int) (models.AnalysisRequest, []models.ModelingInRequestMessage, error) {
+	var analysisRequest models.AnalysisRequest
+	var modelings []models.Modeling
+	var requestModeling []models.AnalysisRequestsModeling
+	var modelingsWithFields []models.ModelingInRequestMessage
+
+	result := r.db.First(&analysisRequest, "request_id =?", requestId)
+	if result.Error != nil {
+		return models.AnalysisRequest{}, nil, result.Error
+	}
+
+	res := r.db.
+		Table("analysis_requests_modelings").
+		Select("modelings.*").
+		Joins("JOIN modelings ON analysis_requests_modelings.modeling_id = modelings.modeling_id").
+		Where("analysis_requests_modelings.request_id = ?", requestId).
+		Find(&modelings)
+	if res.Error != nil {
+		return models.AnalysisRequest{}, nil, res.Error
+	}
+
+	res = r.db.Where("request_id = ?", requestId).Find(&requestModeling)
+	if res.Error != nil {
+		return models.AnalysisRequest{}, nil, res.Error
+	}
+
+	for ind := range modelings {
+		var currentRequest models.ModelingInRequestMessage
+		currentRequest.ModelingId = modelings[ind].ModelingId
+		currentRequest.Name = modelings[ind].Name
+		currentRequest.Image = modelings[ind].Image
+		currentRequest.Description = modelings[ind].Description
+		currentRequest.IsDeleted = modelings[ind].IsDeleted
+		currentRequest.Price = modelings[ind].Price
+
+		currentRequest.ClientQuantity = requestModeling[ind].ClientQuantity
+		currentRequest.QueueSize = requestModeling[ind].QueueSize
+		currentRequest.NodeQuantity = requestModeling[ind].NodeQuantity
+		currentRequest.Result = requestModeling[ind].Result
+
+		modelingsWithFields = append(modelingsWithFields, currentRequest)
+	}
+
+	return analysisRequest, modelingsWithFields, nil
+}
